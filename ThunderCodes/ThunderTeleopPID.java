@@ -367,7 +367,7 @@ imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientation
                         
                         //determine new target position
                         newArmTarget = 1100;
-                        newJointTarget = -580;
+                        newJointTarget = -550;
                         newLiftTarget = -180;
                         
                         ArmTarget = newArmTarget;

@@ -107,9 +107,10 @@
      
     private BNO055IMU imu_IMU;
  
-     static final double ENCODER_CLICKS = 1120;    // REV 40:1  1120
-     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-     static final double WHEEL_CIRC = 2.0;     // For figuring circumference
+    
+     static final double ENCODER_CLICKS = 28;    // REV 20:1  1120
+     static final double DRIVE_GEAR_REDUCTION = 20/1;     // This is < 1.0 if geared UP
+     static final double WHEEL_CIRC = 3.78;     // For figuring circumference
      static final double COUNTS_PER_INCH = (ENCODER_CLICKS * DRIVE_GEAR_REDUCTION) /
              (WHEEL_CIRC * 3.1415);
      static final double DRIVE_SPEED = 1.0;
@@ -182,8 +183,8 @@
     
      
          
-     //huskylens statements
-          huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+         //huskylens statements
+         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
           
         
          /*
@@ -233,22 +234,18 @@
          waitForStart();
          runtime.reset();
          
-         //set servos to close
-     ServoLeft.setPosition(0);
-     ServoRight.setPosition(1);
+         ServoLeft.setPosition(0);
+         ServoRight.setPosition(1);
        
       
              
              //left distance, right distance, speed, runtime.
              //Distances are in FT.
              
-             //step 1 - Drive forward 2 FT and stop.
+             
               telemetry.addData("POSITION", LensPosition);
-             driveBot(2,2,speed,3);
              telemetry.addData("status","first run to position called" );
              telemetry.addData("status", LeftFront.getMode() );
-             telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
-             telemetry.addData("status","right motor,  %7d", RightFront.getCurrentPosition() );
              telemetry.update();
              RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
              LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -257,42 +254,36 @@
              
              //step 2
          //Conditional for camera: 
-         //if seen, proceed to Path 1
-         // if not, turn left and check there
              Parse1();
              if ((LensPosition > 0.99) && (LensPosition < 1.01)) {
                  //Path 1
+                   telemetry.addData("POSITION", LensPosition);
+                    telemetry.update();
                  Path1();
                  
                  
                  } else {
-                 left90();
-                 Parse2();
                      if ((LensPosition > 1.99) && (LensPosition < 2.01)) {
                          
                  //Path 2
+                   telemetry.addData("POSITION", LensPosition);
+                    telemetry.update();
                  Path2();    
                  } else {
                      
                   //path 3
-                  LensPosition = 3;
+                    telemetry.addData("POSITION", LensPosition);
+                    telemetry.update();
                      Path3();
                  }
                  
                  
                  
                  }
-             
-             
-         
-            
-             
-             
-             
           
-      
-      
-      
+             
+     
+
       
      }
      
@@ -316,7 +307,7 @@
      */  
      public static double driveDistance(double distance)
      {
-         double drive  = (ENCODER_CLICKS/ WHEEL_CIRC);
+         double drive  = (COUNTS_PER_INCH * 12);
          int outputClicks= (int)Math.floor(drive * distance);
          return outputClicks;
      }
@@ -385,7 +376,7 @@
        
        //Turn left 90
        public void left90() {
-           driveBot(-1.5,1.5,speed,3);
+           driveBot(-1.6,1.6,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -401,7 +392,7 @@
        
        //Turn Right 90
        public void right90() {
-           driveBot(1.5,-1.5,speed,3);
+           driveBot(1.6,-1.60,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -411,71 +402,78 @@
        
        //Turn Right 180
        public void right180() {
-           driveBot(3,-3,speed,5);
+           driveBot(3.2,-3.2,speed,5);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
              telemetry.addData("status","right motor,  %7d", RightFront.getCurrentPosition() );
              
        }
-       // Center position
-       public void Path1() {
-           driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
-           sleep(200);
-           //turn towards the backdrop - less than 90 degrees
-           driveBot(-1.40, 1.40, 0.3, 2);
-           //drive towards the backdrop
-           CombinedArm();
-           driveBot(3, 3, 0.3, 5);
-           LeftServoDrop();
-         driveBot(-0.3, -0.3, 0.3, 5);
-          ArmZero();
-           
+       
+       //Turn Left 180
+       public void left180() {
+           driveBot(-3.2,3.2,speed,5);
+             telemetry.addData("status","Check position 2 for object" );
+             telemetry.addData("status", LeftFront.getMode() );
+             telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
+             telemetry.addData("status","right motor,  %7d", RightFront.getCurrentPosition() );
+             
+       }
+       // right position
+       public void Path3() {
+       driveBot(2.4, 2.4, 0.5, 3);
+       right90();
+       driveBot(0.4, 0.4, 0.5, 1);
+         sleep(350);
+         driveBot(-1.5, -1.5, 0.5, 3);
+         left180();
+         CombinedArm();
+         driveBot(1.65, 1.65, 0.5, 3);
+         StrafeRight(0.65, 0.3);
+         LeftServoDrop();
+          driveBot(-0.3, -0.3, 0.3, 2);
+            ArmZero();
+            right90();
+              driveBot(-2.5, -2.5, 0.6, 3);
            sleep(30000);
        }
-       //Left Position
+       //center Position
         public void Path2() {
-             driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
-           sleep(200);
-           //turn back towards start position
-           left90();
-           //drive back to start position
-           driveBot(1.5, 1.5, 0.3, 5);
-           //turn towards stage
-           right90();
-           //drive towards backdrop
-           driveBot(2, 2, 0.3, 5);
-           //turn to drive up to backdrop
-           right90();
-           //drive up to backdrop
-           driveBot(1.5, 1.5, 0.3, 5);
-           //turn towards backdrop
+          driveBot(2.3, 2.3, 0.5, 3);
+           sleep(350);
+           driveBot(-0.45, -0.45, 0.3, 3);
            left90();
            CombinedArm();
-           driveBot(1.1, 1.1, 0.3, 5);
-           LeftServoDrop();
-           driveBot(-0.3, -0.3, 0.3, 5);
-           ArmZero();
+            driveBot(3, 3, 0.5, 3);
+            StrafeRight(0.5, 0.45);
+            LeftServoDrop();
+            driveBot(-0.3, -0.3, 0.3, 2);
+            ArmZero();
+            right90();
+              driveBot(-1.7, -1.7, 0.6, 3);
            sleep(30000);
        }
-       //right position
-        public void Path3() {
-           right180();
-           driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
-           sleep(200);
-            //turn towards the backdrop
-           left90();
-           driveBot(0.6, 0.6, 0.3, 5);
-           left90();
-           //drive towards the backdrop
-           CombinedArm();
-           driveBot(2.9, 2.9, 0.3, 5);
-           LeftServoDrop();
-         driveBot(-0.3, -0.3, 0.3, 5);
-          ArmZero();
+       
+       //Left position
+        public void Path1() {
+           driveBot(0.25, 0.25, 0.3, 3);
+          left90();
+          driveBot(2.15, 2.15, 0.5, 3);
+          right90();
+           driveBot(1.75, 1.75, 0.3, 3);
+           right90();
+            driveBot(.90, .90, 0.3, 3);
+             sleep(350);
+              driveBot(-.90, -.90, 0.3, 3);
+              left90();
+              left90();
+              CombinedArm();
+              driveBot(0.75, 0.75, 0.3, 2);
+               LeftServoDrop();
+            driveBot(-0.3, -0.3, 0.3, 2);
+            ArmZero();
+            right90();
+              driveBot(-1.5, -1.5, 0.5, 3);
           
          sleep(30000);
        }
@@ -484,46 +482,39 @@
             
              HuskyLens.Block[] blocks = huskyLens.blocks();
              telemetry.addData("Block count", blocks.length);
-             for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-            
+             
              telemetry.update();
-                   telemetry.addData("Block count", blocks.length);
              for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-             if (blocks.length == 1) {
+                   telemetry.addData("Block", blocks[i].toString());
+                    telemetry.addData("Block Position", blocks[i].x);
+            
+             if (( blocks[i].x > 0)&&( blocks[i].x <100 )) { //1
                  telemetry.addData("IT WORKS", "");
                  LensPosition = 1;
                   telemetry.addData("POSITION", LensPosition);
              
                    telemetry.update();
-             } 
-          
-         
-       }
-       //check for 2
-        public void Parse2() {
-          
-          HuskyLens.Block[] blocks = huskyLens.blocks();
-             telemetry.addData("Block count", blocks.length);
-             for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-            
-             telemetry.update();
-                   telemetry.addData("Block count", blocks.length);
-             for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-             if (blocks.length == 1) {
+             }
+             //path 2
+              if (( blocks[i].x >120)&&( blocks[i].x <230 )) { //1
                  telemetry.addData("IT WORKS", "");
                  LensPosition = 2;
                   telemetry.addData("POSITION", LensPosition);
              
                    telemetry.update();
-             } 
+             }
+                // 3
+                if (( blocks[i].x > 240)&&( blocks[i].x <320 )) { //1
+                 telemetry.addData("IT WORKS", "");
+                 LensPosition = 3;
+                  telemetry.addData("POSITION", LensPosition);
+             
+                   telemetry.update();
+             
+              
+             }
+             }
+        
          
        }
        
@@ -531,10 +522,10 @@
   
   public void RightServoDrop() {
       //open
-       ServoRight.setPosition(1);
+       ServoRight.setPosition(0);
       sleep(500);
       //close
-      ServoRight.setPosition(0);
+      ServoRight.setPosition(1);
       
   }        
   
@@ -551,16 +542,16 @@
   public void WristTransit() {
    Elbow.setTargetPosition(1750);
    Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-   Elbow.setPower(0.8);
-   sleep(3000);
+   Elbow.setPower(0.5);
+   sleep(1000);
    Elbow.setPower(0);
    
   }
   
   //set arm in drop position
   public void ArmDrop() {
-   RightArmM.setTargetPosition(-1750);
-   LeftArmM.setTargetPosition(-1750);
+   RightArmM.setTargetPosition(1750);
+   LeftArmM.setTargetPosition(1750);
    RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    RightArmM.setPower(0.5);
@@ -568,7 +559,6 @@
    sleep(3000);
    RightArmM.setPower(0);
    LeftArmM.setPower(0);
-   
    
   }
   
@@ -580,7 +570,7 @@
    LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    RightArmM.setPower(0.5);
    LeftArmM.setPower(0.5);
-   Elbow.setTargetPosition(1750);
+   Elbow.setTargetPosition(1800);
    Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Elbow.setPower(0.8);
    sleep(3000);
@@ -600,7 +590,7 @@
    RightArmM.setPower(0.5);
    LeftArmM.setPower(0.5);
    Elbow.setPower(0.5);
-   sleep(3000);
+   sleep(2000);
    RightArmM.setPower(0);
    LeftArmM.setPower(0);
    Elbow.setPower(0);
@@ -620,11 +610,6 @@
              RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
              
              runtime.reset();
-             
-              LeftFront.setPower(power);
-             RightFront.setPower(power);
-             LeftBack.setPower(-power);
-             RightBack.setPower(-power);
  
          
              while ((opModeIsActive() &&
@@ -632,6 +617,10 @@
                  {
                     telemetry.addData("Strafing left for", timeoutS);
                      telemetry.update();
+             LeftFront.setPower(power);
+             RightFront.setPower(power);
+             LeftBack.setPower(-power);
+             RightBack.setPower(-power);
                     
                  }
              LeftFront.setPower(0);
@@ -663,11 +652,6 @@
              RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
              
              runtime.reset();
-             
-             LeftFront.setPower(-power);
-             RightFront.setPower(-power);
-             LeftBack.setPower(power);
-             RightBack.setPower(power);
  
          
              while ((opModeIsActive() &&
@@ -675,7 +659,11 @@
                  {
                     telemetry.addData("Strafing right for", timeoutS);
                      telemetry.update();
-         
+             LeftFront.setPower(-power);
+             RightFront.setPower(-power);
+             LeftBack.setPower(power);
+             RightBack.setPower(power);
+                    
                  }
              LeftFront.setPower(0);
              RightFront.setPower(0);
@@ -693,7 +681,5 @@
   }
   
   //Operational methods end
-  
-  
  }
  

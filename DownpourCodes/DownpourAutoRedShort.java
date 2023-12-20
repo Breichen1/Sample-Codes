@@ -107,15 +107,15 @@
      
     private BNO055IMU imu_IMU;
  
-   
-    static final double ENCODER_CLICKS = 28;    // REV 20:1  1120
-    static final double DRIVE_GEAR_REDUCTION = 20/1;     // This is < 1.0 if geared UP
-    static final double WHEEL_CIRC = 3.78;     // For figuring circumference
-    static final double COUNTS_PER_INCH = (ENCODER_CLICKS * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_CIRC * 3.1415);
-    static final double DRIVE_SPEED = 1.0;
-    static final double TURN_SPEED = 0.5;
-    static final double speed = 0.5;
+    
+     static final double ENCODER_CLICKS = 28;    // REV 20:1  1120
+     static final double DRIVE_GEAR_REDUCTION = 20/1;     // This is < 1.0 if geared UP
+     static final double WHEEL_CIRC = 3.78;     // For figuring circumference
+     static final double COUNTS_PER_INCH = (ENCODER_CLICKS * DRIVE_GEAR_REDUCTION) /
+             (WHEEL_CIRC * 3.1415);
+     static final double DRIVE_SPEED = 1.0;
+     static final double TURN_SPEED = 0.5;
+     static final double speed = 0.5;
      
      double LensPosition = 0;
      
@@ -236,7 +236,6 @@
          
          ServoLeft.setPosition(0);
          ServoRight.setPosition(1);
-          catcher.setPosition(1);
        
       
              
@@ -410,18 +409,18 @@
              telemetry.addData("status","right motor,  %7d", RightFront.getCurrentPosition() );
              
        }
-       // Center position
+       // Left position
        public void Path1() {
        driveBot(2.2, 2.2, 0.5, 3);
        left90();
-       driveBot(0.4, 0.4, 0.5, 1);
-         catcher.setPosition(0.6);
+       driveBot(0.35, 0.35, 0.5, 1);
          sleep(350);
          driveBot(-1.5, -1.5, 0.5, 3);
-         right180();
+        right90();
+        right90();
          CombinedArm();
-         driveBot(1.55, 1.55, 0.5, 3);
-         StrafeLeft(0.5, 0.3);
+         driveBot(1.65, 1.65, 0.5, 3);
+         StrafeLeft(0.65, 0.3);
          LeftServoDrop();
           driveBot(-0.3, -0.3, 0.3, 2);
             ArmZero();
@@ -429,15 +428,15 @@
               driveBot(-2, -2, 0.6, 3);
            sleep(30000);
        }
-       //right Position
+       //Center Position
         public void Path2() {
-          driveBot(2.2, 2.2, 0.5, 3);
-           catcher.setPosition(0.6);
+          driveBot(2.4, 2.4, 0.5, 3);
            sleep(350);
-           driveBot(-0.5, -0.5, 0.3, 3);
+           driveBot(-0.4, -0.4, 0.3, 3);
            right90();
            CombinedArm();
-            driveBot(2.9, 2.9, 0.5, 3);
+            driveBot(3, 3, 0.5, 3);
+             StrafeLeft(0.6, 0.3);
             LeftServoDrop();
             driveBot(-0.3, -0.3, 0.3, 2);
             ArmZero();
@@ -446,16 +445,15 @@
            sleep(30000);
        }
        
-       //left position
+       //Right position
         public void Path3() {
            driveBot(0.25, 0.25, 0.3, 3);
           right90();
           driveBot(2.25, 2.25, 0.5, 3);
           left90();
-           driveBot(1.25, 1.25, 0.3, 3);
+           driveBot(1.6, 1.6, 0.3, 3);
            left90();
             driveBot(.90, .90, 0.3, 3);
-            catcher.setPosition(0.6);
              sleep(350);
               driveBot(-.90, -.90, 0.3, 3);
               right180();
@@ -465,7 +463,7 @@
             driveBot(-0.3, -0.3, 0.3, 2);
             ArmZero();
             left90();
-              driveBot(-1.3, -1.3, 0.5, 3);
+              driveBot(-1.5, -1.5, 0.5, 3);
           
          sleep(30000);
        }
@@ -480,7 +478,7 @@
                    telemetry.addData("Block", blocks[i].toString());
                     telemetry.addData("Block Position", blocks[i].x);
             
-             if (( blocks[i].x > 20)&&( blocks[i].x <100 )) { //1
+             if (( blocks[i].x > 0)&&( blocks[i].x <100 )) { //1
                  telemetry.addData("IT WORKS", "");
                  LensPosition = 1;
                   telemetry.addData("POSITION", LensPosition);
